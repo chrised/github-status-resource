@@ -16,14 +16,15 @@ eval $( jq -r '{
 # lookup
 #
 
-curlgh "$source_endpoint/repos/$source_repository/commits/$version_commit/status" \
-  | jq -c \
-    --arg status "$version_status" \
-    '{
-      "sha": .sha,
-      "status": ( .statuses | map(select( $status == ( .id | tostring ) )) | .[0] )
-    }' \
-    > /tmp/status
+curlgh "$source_endpoint/repos/${source_repository}/statuses/${version_commit}" \
+    | jq -c \
+      --arg status "${version_status}" \
+      --arg commit "${version_commit}" \
+      '{
+        "sha": $commit,
+        "status": ( . | map(select( $status == ( .id | tostring ))) | .[0] )
+      }' \
+      > /tmp/status
 
 
 #
